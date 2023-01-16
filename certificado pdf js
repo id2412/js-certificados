@@ -1,0 +1,134 @@
+const userName = document.getElementById("name");
+const Curso = document.getElementById("Curso");
+const submitBtn = document.getElementById("submitBtn");
+
+const { PDFDocument, rgb, degrees } = PDFLib;
+
+
+const capitalize = (str, lower = false) =>
+  (lower ? str.toLowerCase() : str).replace(/(?:^|\s|["'([{])+\S/g, (match) =>
+    match.toUpperCase()
+  );
+
+submitBtn.addEventListener("click", () => {
+  const val = capitalize(userName.value);
+
+  //check if the text is empty or not
+  if (val.trim() !== "" && userName.checkValidity()) {
+    // console.log(val);
+    generatePDF(val);
+  } else {
+    userName.reportValidity();
+  }
+})
+submitBtn.addEventListener("click", () => {
+    const val2 = capitalize(Curso.value);
+  
+    //check if the text is empty or not
+    if (val2.trim() !== "" && Curso.checkValidity()) {
+      // console.log(val);
+      generatePDF2(val2);
+    } else {
+      Curso.reportValidity();
+    }
+});
+
+const generatePDF = async (name) => {
+  const existingPdfBytes = await fetch("./certiGC.pdf").then((res) =>
+    res.arrayBuffer()
+  );
+
+  // Load a PDFDocument from the existing PDF bytes
+  const pdfDoc = await PDFDocument.load(existingPdfBytes);
+  pdfDoc.registerFontkit(fontkit);
+
+  //get font
+  const fontBytes = await fetch("./Sanchez-Regular.ttf").then((res) =>
+    res.arrayBuffer()
+  );
+
+  // Embed our custom font in the document
+  const SanChezFont = await pdfDoc.embedFont(fontBytes);
+
+  // Get the first page of the document
+  const pages1 = pdfDoc.getPages();
+  const firstPage1 = pages[0];
+
+  // Draw a string of text diagonally across the first page
+  firstPage1.drawText(name, { 
+    x: 300,
+    y: 270, 
+    size: 45, 
+    font: SanChezFont,
+    color: rgb(0.0, 0.0, 0.2),
+  })
+  ;
+
+  // Serialize the PDFDocument to bytes (a Uint8Array)
+  const pdfBytes = await pdfDoc.save();
+  console.log("Creado");
+
+  // this was for creating uri and showing in iframe
+
+  // const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
+  // document.getElementById("pdf").src = pdfDataUri;
+
+  var file = new File(
+    [pdfBytes],
+    "Certificado Gestión Contable.pdf",
+    {
+      type: "application/pdf;charset=utf-8",
+    }
+  );
+ saveAs(file);
+};
+const generatePDF2 = async (Curso) => {
+    const existingPdfBytes = await fetch("./certiGC.pdf").then((res) =>
+      res.arrayBuffer()
+    );
+  
+    // Load a PDFDocument from the existing PDF bytes
+    const pdfDoc = await PDFDocument.load(existingPdfBytes);
+    pdfDoc.registerFontkit(fontkit);
+  
+    //get font
+    const fontBytes = await fetch("./Sanchez-Regular.ttf").then((res) =>
+      res.arrayBuffer()
+    );
+  
+    // Embed our custom font in the document
+    const SanChezFont = await pdfDoc.embedFont(fontBytes);
+  
+    // Get the first page of the document
+ 
+    // Draw a string of text diagonally across the first page
+    
+    const pages = pdfDoc.getPages();
+    const firstPage = pages[0];
+    firstPage.drawText(Curso, {
+  x: 300,
+  y: 240,
+  size: 35,
+  font: SanChezFont,
+  color: rgb(0.0, 0.0, 0.2),
+})
+    ;
+  
+    // Serialize the PDFDocument to bytes (a Uint8Array)
+    const pdfBytes = await pdfDoc.save();
+    console.log("Creado");
+  
+    // this was for creating uri and showing in iframe
+  
+    // const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
+    // document.getElementById("pdf").src = pdfDataUri;
+  
+    var file = new File(
+      [pdfBytes],
+      "Certificado Gestión Contable.pdf",
+      {
+        type: "application/pdf;charset=utf-8",
+      }
+    );
+   saveAs(file);
+  }
